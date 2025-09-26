@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, Calendar, User, DollarSign, Clock, Edit2, Trash2, FileText, Download, Filter } from 'lucide-react';
+import { Plus, Search, Calendar, User, DollarSign, Clock, CreditCard as Edit2, Trash2, FileText, Download, Filter } from 'lucide-react';
 import { useApp, Project } from '../contexts/AppContext';
 import ProjectModal from '../components/ProjectModal';
 
