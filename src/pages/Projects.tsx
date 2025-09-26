@@ -47,29 +47,36 @@ const Projects: React.FC = () => {
     
     // Configurações da empresa
     const companyInfo = {
-      name: 'Carnevalli Esquadrias',
-      address: 'Endereço da Empresa',
-      phone: '(11) 99999-9999',
-      email: 'contato@carnevalli.com.br',
-      website: 'www.carnevalli.com.br'
+      name: 'CARNEVALLI ESQUADRIAS LTDA',
+      address: 'BUARQUE DE MACEDO, 2735 - PAVILHÃO - CENTRO',
+      city: 'Nova Prata - RS - CEP: 95320-000',
+      phone: '(54) 3242-2072',
+      email: 'carnevalli.esquadrias@gmail.com',
+      cnpj: '88.235.288/0001-24',
+      ie: '0850011930'
     };
     
-    // Cabeçalho com logo (simulado)
-    doc.setFillColor(41, 98, 165);
+    // Cabeçalho com fundo azul
+    doc.setFillColor(70, 130, 180);
     doc.rect(0, 0, 210, 40, 'F');
     
     // Nome da empresa
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
+    doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
     doc.text(companyInfo.name, 20, 25);
     
     // Informações de contato
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text(companyInfo.phone, 20, 32);
-    doc.text(companyInfo.email, 80, 32);
-    doc.text(companyInfo.website, 140, 32);
+    doc.text(companyInfo.address, 20, 32);
+    doc.text(companyInfo.city, 20, 36);
+    
+    // Informações de contato no lado direito
+    doc.text(companyInfo.phone, 140, 25);
+    doc.text(companyInfo.email, 140, 29);
+    doc.text(`CNPJ: ${companyInfo.cnpj}`, 140, 33);
+    doc.text(`IE: ${companyInfo.ie}`, 140, 37);
     
     // Título do documento
     doc.setTextColor(0, 0, 0);
@@ -90,37 +97,38 @@ const Projects: React.FC = () => {
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
     doc.text(`Cliente: ${project.client_name}`, 20, 85);
-    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 95);
+    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 140, 85);
     
     // Descrição do projeto
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('DESCRIÇÃO DO PROJETO', 20, 115);
+    doc.text('DESCRIÇÃO DO PROJETO', 20, 105);
     
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Projeto: ${project.title}`, 20, 125);
+    doc.text(`Projeto: ${project.title}`, 20, 115);
     
     // Quebra de linha para descrição longa
-    const splitDescription = doc.splitTextToSize(project.description, 170);
-    doc.text(splitDescription, 20, 135);
+    const splitDescription = doc.splitTextToSize(project.description, 160);
+    doc.text(splitDescription, 20, 125);
     
-    let yPosition = 135 + (splitDescription.length * 5) + 20;
+    let yPosition = 125 + (splitDescription.length * 5) + 15;
     
     // Produtos/Serviços
     if (project.products && project.products.length > 0) {
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
-      doc.text('ITENS DO PROJETO', 20, yPosition);
+      doc.text('PRODUTOS/SERVIÇOS', 20, yPosition);
       yPosition += 15;
       
       // Cabeçalho da tabela
       doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');
-      doc.text('Item', 20, yPosition);
-      doc.text('Qtd', 120, yPosition);
-      doc.text('Valor Unit.', 140, yPosition);
-      doc.text('Total', 170, yPosition);
+      doc.text('Qt.', 20, yPosition);
+      doc.text('Produto/Serviço', 35, yPosition);
+      doc.text('Detalhe do item', 90, yPosition);
+      doc.text('Valor unitário', 140, yPosition);
+      doc.text('Subtotal', 175, yPosition);
       yPosition += 5;
       
       // Linha separadora
@@ -130,19 +138,45 @@ const Projects: React.FC = () => {
       // Itens
       doc.setFont('helvetica', 'normal');
       project.products.forEach((product) => {
-        doc.text(product.product_name, 20, yPosition);
-        doc.text(product.quantity.toString(), 120, yPosition);
-        doc.text(`R$ ${product.unit_price.toFixed(2)}`, 140, yPosition);
-        doc.text(`R$ ${product.total_price.toFixed(2)}`, 170, yPosition);
+        doc.text(product.quantity.toString(), 20, yPosition);
+        doc.text(product.product_name, 35, yPosition);
+        // Descrição do produto (se houver)
+        doc.setFontSize(8);
+        doc.text('Produto personalizado conforme especificação', 35, yPosition + 4);
+        doc.setFontSize(10);
+        doc.text(`${product.unit_price.toFixed(2).replace('.', ',')}`, 140, yPosition);
+        doc.text(`${product.total_price.toFixed(2).replace('.', ',')}`, 175, yPosition);
         yPosition += 8;
       });
+      
+      // Totais
+      yPosition += 10;
+      doc.line(140, yPosition, 190, yPosition);
+      yPosition += 8;
+      
+      doc.setFont('helvetica', 'bold');
+      doc.text('Total', 140, yPosition);
+      doc.text(`${project.budget.toFixed(2).replace('.', ',')}`, 175, yPosition);
+      yPosition += 6;
+      
+      if (project.payment_terms?.discount_percentage && project.payment_terms.discount_percentage > 0) {
+        doc.text('Descontos', 140, yPosition);
+        const discountAmount = project.budget * (project.payment_terms.discount_percentage / 100);
+        doc.text(`${discountAmount.toFixed(2).replace('.', ',')}`, 175, yPosition);
+        yPosition += 6;
+        
+        doc.text('Valor líquido', 140, yPosition);
+        const finalValue = project.payment_terms.total_with_discount || (project.budget - discountAmount);
+        doc.text(`${finalValue.toFixed(2).replace('.', ',')}`, 175, yPosition);
+        yPosition += 6;
+      }
     }
     
     // Condições de pagamento
     yPosition += 10;
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('CONDIÇÕES DE PAGAMENTO', 20, yPosition);
+    doc.text('Condição de pagamento:', 20, yPosition);
     yPosition += 15;
     
     doc.setFontSize(11);
@@ -160,35 +194,56 @@ const Projects: React.FC = () => {
       
       doc.text(`Forma de Pagamento: ${paymentMethodLabels[project.payment_terms.payment_method]}`, 20, yPosition);
       yPosition += 8;
-      doc.text(`Parcelas: ${project.payment_terms.installments}x`, 20, yPosition);
-      yPosition += 8;
       
-      if (project.payment_terms.discount_percentage > 0) {
-        doc.text(`Desconto: ${project.payment_terms.discount_percentage}%`, 20, yPosition);
+      // Tabela de parcelas
+      if (project.payment_terms.installments > 1) {
+        yPosition += 5;
+        doc.setFont('helvetica', 'bold');
+        doc.text('Nº', 20, yPosition);
+        doc.text('Vencimento', 50, yPosition);
+        doc.text('Valor (R$)', 120, yPosition);
         yPosition += 8;
-      }
-      
-      if (project.payment_terms.installment_value) {
-        doc.text(`Valor da Parcela: R$ ${project.payment_terms.installment_value.toFixed(2)}`, 20, yPosition);
+        
+        doc.setFont('helvetica', 'normal');
+        for (let i = 1; i <= project.payment_terms.installments; i++) {
+          const installmentDate = new Date();
+          installmentDate.setMonth(installmentDate.getMonth() + (i - 1));
+          
+          doc.text(`${i}º`, 20, yPosition);
+          doc.text(installmentDate.toLocaleDateString('pt-BR'), 50, yPosition);
+          doc.text(`${(project.payment_terms.installment_value || 0).toFixed(2).replace('.', ',')}`, 120, yPosition);
+          yPosition += 6;
+        }
+      } else {
+        yPosition += 5;
+        doc.setFont('helvetica', 'bold');
+        doc.text('Nº', 20, yPosition);
+        doc.text('Vencimento', 50, yPosition);
+        doc.text('Valor (R$)', 120, yPosition);
         yPosition += 8;
+        
+        doc.setFont('helvetica', 'normal');
+        doc.text('1º', 20, yPosition);
+        doc.text(new Date().toLocaleDateString('pt-BR'), 50, yPosition);
+        const finalAmount = project.payment_terms.total_with_discount || project.budget;
+        doc.text(`${finalAmount.toFixed(2).replace('.', ',')}`, 120, yPosition);
       }
     }
     
-    // Valor total
-    yPosition += 10;
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    const totalValue = project.payment_terms?.total_with_discount || project.budget;
-    doc.text(`VALOR TOTAL: R$ ${totalValue.toFixed(2)}`, 20, yPosition);
-    
     // Rodapé
+    yPosition = 270; // Posição fixa para o rodapé
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text('Este orçamento tem validade de 30 dias.', 20, 280);
-    doc.text('Agradecemos a preferência!', 20, 290);
+    doc.text('Este orçamento tem validade de 30 dias.', 20, yPosition);
+    doc.text('Agradecemos a preferência!', 20, yPosition + 5);
+    
+    // Linha no rodapé
+    doc.line(20, yPosition + 15, 190, yPosition + 15);
+    doc.text('Página 1 de 1', 170, yPosition + 20);
     
     // Salvar o PDF
-    const fileName = `${project.type}_${project.number.toString().padStart(4, '0')}_${project.client_name?.replace(/\s+/g, '_')}.pdf`;
+    const docType = project.type === 'orcamento' ? 'Orcamento' : 'Venda';
+    const fileName = `${project.client_name?.replace(/\s+/g, '_')} - ${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')} - ${docType}${project.number}.pdf`;
     doc.save(fileName);
   };
 
