@@ -60,7 +60,7 @@ const Projects: React.FC = () => {
     try {
       const logoImg = new Image();
       logoImg.crossOrigin = 'anonymous';
-      logoImg.src = '/Logo2.png';
+      logoImg.src = '/400dpiLogoCropped.png';
       
       await new Promise((resolve, reject) => {
         logoImg.onload = () => {
@@ -100,7 +100,7 @@ const Projects: React.FC = () => {
     try {
       const logoImg = new Image();
       logoImg.crossOrigin = 'anonymous';
-      logoImg.src = '/Logo2.png';
+      logoImg.src = '/400dpiLogoCropped.png';
       
       await new Promise((resolve, reject) => {
         logoImg.onload = () => {
