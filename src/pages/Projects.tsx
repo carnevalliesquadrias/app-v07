@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Search, Calendar, User, DollarSign, Clock, CreditCard as Edit2, Trash2, FileText, Download, Filter } from 'lucide-react';
 import { useApp, Project } from '../contexts/AppContext';
-import ProjectModal from '../components/ProjectModal';
+import ProjectFormModal from '../components/ProjectFormModal';
 
 const Projects: React.FC = () => {
   const { projects, deleteProject } = useApp();
@@ -510,7 +510,7 @@ const Projects: React.FC = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <ProjectModal
+        <ProjectFormModal
           project={editingProject}
           onClose={handleModalClose}
         />
